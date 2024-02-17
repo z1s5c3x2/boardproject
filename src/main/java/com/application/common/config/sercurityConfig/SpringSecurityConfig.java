@@ -1,18 +1,16 @@
-package com.application.config;
+package com.application.common.config.sercurityConfig;
 
 
 
-import com.application.service.LoginService;
-import com.application.service.LogoutService;
-import com.application.service.UserDetailsService;
+import com.application.service.auth.LoginService;
+import com.application.service.auth.LogoutService;
+import com.application.service.auth.UserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,11 +64,11 @@ public class SpringSecurityConfig {
 
         return http.build();
     }
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
-    }
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return (web) -> web.ignoring()
+//                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+//    }
     @Bean
     public PasswordEncoder passwordEncoder() throws Exception {
         return new BCryptPasswordEncoder();

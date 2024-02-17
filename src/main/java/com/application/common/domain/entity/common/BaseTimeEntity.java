@@ -1,4 +1,4 @@
-package com.application.model.entity;
+package com.application.common.domain.entity.common;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @EntityListeners(value = {AuditingEntityListener.class})
 @MappedSuperclass
 @Getter
-@Setter
 public class BaseTimeEntity {
 
     @CreatedDate

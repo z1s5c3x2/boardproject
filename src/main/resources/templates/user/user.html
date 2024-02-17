@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="//code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="/common/user/user.js" charset="UTF-8"></script>
+</head>
+
+<body>
+<h2> 회원가입</h2>
+<form class="signUpForm" name="signUpForm">
+    user Name:
+    <input type="text" name="userName"  placeholder="Enter user name">
+    한글 1~10
+    <br>
+
+    Password:
+    <input type="password" name="userPassword" placeholder="Enter password 대,소,특수문자,숫자 포함 6~20">
+
+    <br>
+
+    Nick Name:
+    <input type="text" name="userNickName" placeholder="Enter nick name 2~20글자 사이">
+
+    <br>
+
+    Phone:
+    <input type="tel" name="userPhone" placeholder="Enter phone number (123-2134-1234)"><br>
+
+    Email:
+    <input type="email" name="userEmail" placeholder="Enter email (test@test.com">
+    <span class="resultEmail"> </span>
+    <br>
+
+    Birth Date:
+    <input type="text" name="userBirth" placeholder="Enter birth date (998877-1)"><br>
+    <button type="button" onclick="onRegister()"> 가입</button>
+</form>
+</body>
+</html>
