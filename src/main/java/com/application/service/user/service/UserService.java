@@ -12,15 +12,15 @@ import org.springframework.stereotype.Service;
 @Transactional
 @Slf4j
 public class UserService {
-
+    private final UserRepository userRepository;
     public String getTest(String tmp){
+        userRepository.findAll();
         return tmp+"getTest";
     }
 
     
-    public void register(UserDto userDto)
+    public boolean register(UserDto userDto)
     {
-        System.out.println("UserService.register");
-        System.out.println("userDto = " + userDto);
+        return userRepository.save(userDto.toEntity()).getUserNo() > 0;
     }
 }
