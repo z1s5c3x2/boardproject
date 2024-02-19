@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.method.MethodValidationException;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -48,7 +49,7 @@ class UserControllerTest {
                 .userName("가나다")
                 .userEmail("z1s5c3x2@gmail.com")
                 .userPassword("asdASD!@#1")
-                .userNickname("asdf")
+                .userNickname("zxcv")
                 .userPhone("010-1234-1234")
                 .userGradle("USER")
                 .userBirth("990101-1")
@@ -58,7 +59,6 @@ class UserControllerTest {
 
         for(Field f : userDto.getClass().getDeclaredFields()){
             f.setAccessible(true);
-            if(f.get(userDto)==null){continue;}
             params.add(f.getName(),f.get(userDto).toString());
         }
 
