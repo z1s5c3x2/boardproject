@@ -5,7 +5,6 @@ import com.application.common.domain.entity.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 
 @Entity @Data
 @Builder
@@ -32,7 +31,7 @@ public class UserEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String userBirth;
     @ColumnDefault("'USER'")
-    private String userGradle;
+    private String userGrade;
     @Column(columnDefinition = "boolean default true",insertable = false)
     private boolean isCredentialsNonExpired;
     @Column(columnDefinition = "boolean default true",insertable = false)
@@ -52,7 +51,7 @@ public class UserEntity extends BaseTimeEntity {
                 .userPhone(this.userPhone)
                 .userEmail(this.userEmail)
                 .userBirth(this.userBirth)
-                .userGradle(this.userGradle)
+                .userGrade(this.userGrade)
                 .isCredentialsNonExpired(this.isCredentialsNonExpired)
                 .isAccountNonExpired(this.isAccountNonExpired)
                 .isAccountNonLocked(this.isAccountNonLocked)

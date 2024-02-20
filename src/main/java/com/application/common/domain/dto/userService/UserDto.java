@@ -39,7 +39,7 @@ public class UserDto implements UserDetails {
     private String userBirth;
     @NotBlank(message = "권한을 입력해주세요")
     @Pattern(regexp = "USER|ADMIN",message = "유효하지 않은 권한 입니다")
-    private String userGradle;
+    private String userGrade;
 
     /* user Details */
 
@@ -53,7 +53,7 @@ public class UserDto implements UserDetails {
         collection.add(new GrantedAuthority() {
             @Override
             public String getAuthority() {
-                return "ROLE_"+userGradle;
+                return "ROLE_"+ userGrade;
             }
         });
         return collection;
@@ -97,7 +97,7 @@ public class UserDto implements UserDetails {
                 .userPhone(this.userPhone)
                 .userEmail(this.userEmail)
                 .userBirth(this.userBirth)
-                .userGradle(this.userGradle)
+                .userGrade(this.userGrade)
                 .isCredentialsNonExpired(this.isCredentialsNonExpired)
                 .isAccountNonExpired(this.isAccountNonExpired)
                 .isAccountNonLocked(this.isAccountNonLocked)

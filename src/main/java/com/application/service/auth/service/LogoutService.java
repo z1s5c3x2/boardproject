@@ -1,4 +1,4 @@
-package com.application.service.auth;
+package com.application.service.auth.service;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

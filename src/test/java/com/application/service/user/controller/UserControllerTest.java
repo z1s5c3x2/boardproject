@@ -1,29 +1,22 @@
 package com.application.service.user.controller;
 
+import com.application.common.domain.dto.jwtService.LoginRequestDto;
 import com.application.common.domain.dto.userService.UserDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.mock.web.MockPart;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.validation.method.MethodValidationException;
 
-import java.io.File;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -36,12 +29,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @DisplayName("유저 테스트")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Transactional
 class UserControllerTest {
     @Autowired
     MockMvc mvc;
+    @Autowired
+    ObjectMapper objectMapper;
 
-
-    @Test
+    @Test @Order(1)
     @DisplayName("가입 성공 테스트")
     void registerSuccessTest() throws Exception {
         //given
@@ -51,8 +47,8 @@ class UserControllerTest {
                 .userPassword("asdASD!@#1")
                 .userNickname("zxcv")
                 .userPhone("010-1234-1234")
-                .userGradle("USER")
-                .userBirth("990101-1")
+                .userGrade("USER")
+                .userBirth("990201-1")
                 .build();
 
         MultiValueMap<String,String> params = new LinkedMultiValueMap<>();
@@ -61,7 +57,6 @@ class UserControllerTest {
             f.setAccessible(true);
             params.add(f.getName(),f.get(userDto).toString());
         }
-
         //when
         ResultActions resultActions = mvc.perform(multipart("/user/register")
                         .params(params)
@@ -73,7 +68,7 @@ class UserControllerTest {
                 .andExpect(content().string("true"));
     }
 
-    @Test
+    @Test @Order(2)
     @DisplayName("가입 실패 테스트")
     void registerFailTest() throws Exception {
         //given
@@ -84,7 +79,7 @@ class UserControllerTest {
                 .userNickname("asdf")
                 .userPhone("010-1234-1234")
                 .userBirth("990101-1")
-                .userGradle("USER")
+                .userGrade("USER")
                 .build();
 
         MultiValueMap<String,String> params = new LinkedMultiValueMap<>();
@@ -103,4 +98,16 @@ class UserControllerTest {
         resultActions
                 .andExpect(status().isBadRequest());
     }
+
+    @Test @Order(3)
+    @DisplayName("로그인 테스트")
+
+    void loginTest() throws Exception {
+        LoginRequestDto dto = new LoginRequestDto("z1s5c3x2@gmail.com","asdASD!@#1");
+        mvc.perform(post("/user/login").content(
+                objectMapper.writeValueAsString(dto)
+        ).contentType(MediaType.APPLICATION_JSON))
+                .andDo(print());
+    }
+
 }
