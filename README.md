@@ -8,7 +8,7 @@
 
 ## 환경
 - 언어: Java 17
-- 배포: Docker -> AWS EC2 + RDS (예정)
+- 배포: Docker -> AWS EC2 , RDS 추가 예정
 - 백엔드: Spring Boot 3.2.2
 - 프론트: Next.js 14.1.0 (예정)
 - 
