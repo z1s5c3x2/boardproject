@@ -1,9 +1,9 @@
-package com.application.common.config.sercurityConfig;
+package com.application.common.config.sercurity;
 
 
 
-import com.application.common.config.jwtconfig.JwtAuthFilter;
-import com.application.common.config.jwtconfig.JwtTokenProvider;
+import com.application.common.config.jwt.JwtAuthFilter;
+import com.application.common.config.jwt.JwtTokenProvider;
 import com.application.service.auth.service.LoginService;
 import com.application.service.auth.service.LogoutService;
 import com.application.service.auth.service.CustomDetailsService;
@@ -63,7 +63,7 @@ public class SpringSecurityConfig {
 //                        .userDetailsService(customDetailsService)
 //                        .alwaysRemember(false)
 //                )
-                .exceptionHandling( e -> e.accessDeniedPage(HTML_PATH+"accessdenied.html"))
+                //.exceptionHandling( e -> e.accessDeniedPage(HTML_PATH+"accessdenied.html"))
                 .sessionManagement( s-> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JwtAuthFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

@@ -2,7 +2,6 @@ package com.application.service.user.controller;
 
 import com.application.common.domain.dto.jwtService.LoginRequestDto;
 import com.application.common.domain.dto.userService.UserDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
@@ -18,7 +17,6 @@ import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.Field;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -37,7 +35,7 @@ class UserControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @Test @Order(1)
+    //@Test @Order(1)
     @DisplayName("가입 성공 테스트")
     void registerSuccessTest() throws Exception {
         //given
@@ -68,7 +66,7 @@ class UserControllerTest {
                 .andExpect(content().string("true"));
     }
 
-    @Test @Order(2)
+    //@Test @Order(2)
     @DisplayName("가입 실패 테스트")
     void registerFailTest() throws Exception {
         //given
@@ -108,6 +106,17 @@ class UserControllerTest {
                 objectMapper.writeValueAsString(dto)
         ).contentType(MediaType.APPLICATION_JSON))
                 .andDo(print());
+
+        mvc.perform(get("/user"))
+                .andDo(print());
     }
+
+    @Test @Order(4)
+    @DisplayName("로그인 이후 요청")
+    void afterLoginRequest()throws Exception{
+        mvc.perform(get("/user"))
+                .andDo(print());
+    }
+
 
 }

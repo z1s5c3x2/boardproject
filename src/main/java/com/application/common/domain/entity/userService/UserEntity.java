@@ -58,4 +58,12 @@ public class UserEntity extends BaseTimeEntity {
                 .isEnabled(this.isEnabled)
                 .build();
     }
+
+    public UserDto loginToDto(){
+        return UserDto.builder()
+                .userEmail(this.userEmail)
+                .userName(this.userName)
+                .userPassword(this.userPassword)
+                .userGrade(this.userGrade).build();
+    }
 }

@@ -8,5 +8,10 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class TokenDto {
-    private String token;
+    private String accessToken;
+    private String refreshToken;
+
+    public boolean isNull(){
+        return accessToken == null && refreshToken == null;
+    }
 }

@@ -1,6 +1,6 @@
 package com.application.service.user.service;
 
-import com.application.common.config.jwtconfig.JwtTokenProvider;
+import com.application.common.config.jwt.JwtTokenProvider;
 import com.application.common.domain.dto.jwtService.LoginRequestDto;
 import com.application.common.domain.dto.jwtService.TokenDto;
 import com.application.common.domain.dto.userService.UserDto;
@@ -8,7 +8,6 @@ import com.application.service.user.repository.UserEntityRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -37,7 +36,9 @@ public class UserService {
         log.info("userLogin hi");
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginRequestDto.getUserEmail(),loginRequestDto.getUserPassword());
+        log.info("UsernamePasswordAuthenticationToken = {}",authenticationToken);
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        log.info("authentication create : {}",authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return jwtTokenProvider.createToken(authentication);
 

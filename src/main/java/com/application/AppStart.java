@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 @SpringBootApplication
 @Slf4j
-
 public class AppStart {
     public static void main(String[] args) {
         SpringApplication.run(AppStart.class);
