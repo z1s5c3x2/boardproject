@@ -35,7 +35,7 @@ class UserControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    //@Test @Order(1)
+    @Test @Order(1)
     @DisplayName("가입 성공 테스트")
     void registerSuccessTest() throws Exception {
         //given

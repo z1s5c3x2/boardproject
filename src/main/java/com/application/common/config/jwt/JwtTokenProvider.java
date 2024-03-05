@@ -56,7 +56,7 @@ public class JwtTokenProvider{
                 .refreshToken(createRefreshToken()).build();
     }
 
-    private String createAccessToken(Authentication authentication){
+    public String createAccessToken(Authentication authentication){
         log.info("create access token {}",authentication);
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -119,7 +119,7 @@ public class JwtTokenProvider{
     }
 
     /* 임시  위 코드에서 만료 분리 예정*/
-    public boolean isExpired(TokenDto token) {
+    public boolean isExpired(TokenDto token){
         if(token.getAccessToken() == null){return false;}
 
         try {
@@ -129,7 +129,7 @@ public class JwtTokenProvider{
                     .parseSignedClaims(token.getAccessToken());
 
         }catch (ExpiredJwtException e){
-            log.error("ㅇㄹ허ㅏㅗㅁㄷㄱ힏ㄱ {}",e);
+            log.error("act 시간 만료 {}",e);
             return true;
         }
 //        catch (ExpiredJwtException e) {

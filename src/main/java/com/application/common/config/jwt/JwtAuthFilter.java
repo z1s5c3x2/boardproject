@@ -7,6 +7,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.util.WebUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -38,6 +40,17 @@ public class JwtAuthFilter extends GenericFilterBean {
             log.info("토큰 재발급 ㄱㄱ");
             Authentication authentication = jwtTokenProvider.getAuthentication(tokenDto.getAccessToken());
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            String act = jwtTokenProvider.createAccessToken(authentication);
+            tokenDto.setAccessToken(act);
+            Arrays.stream(((HttpServletRequest) request).getCookies()).forEach(c->{
+                if(c.getName().equals("accessToken")){
+                    System.out.println("찾음");
+                    System.out.println(act);
+                    c.setValue(act);
+                    ((HttpServletResponse)response).addCookie(c);
+                }
+            });
+
         }else if (!jwtTokenProvider.validateToken(tokenDto)){
             log.error("유효한 JWT 토큰이 없습니다, uri : {}",((HttpServletRequest) request).getRequestURI());
         }
