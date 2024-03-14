@@ -11,6 +11,7 @@ import io.jsonwebtoken.security.Keys;
 import io.lettuce.core.RedisException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Instanceof;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -52,18 +53,23 @@ public class JwtTokenProvider{
 
     public TokenDto createToken(Authentication authentication){
         return TokenDto.builder()
-                .accessToken(createAccessToken(authentication))
+                .accessToken(createAccessToken(authentication,"Email"))
                 .refreshToken(createRefreshToken()).build();
     }
 
-    public String createAccessToken(Authentication authentication){
-        log.info("create access token {}",authentication);
+    public String createAccessToken(Authentication authentication,String _type){
+
+        System.out.println("(UserDetails)authentication = " +authentication);
+        String email = _type.equals("Email") ?
+                ((UserDto)authentication.getPrincipal()).getUserEmail() :
+                ((UserDetails)authentication.getPrincipal()).getUsername();
+
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         Date validity = new Date(new Date().getTime()+this.accessTokenLiveSecond);
-        return Jwts.builder().subject(authentication.getName())
+        return Jwts.builder().subject(email)
                 .claim(AUTHORITIES_KEY, authorities)
                 .signWith(key,Jwts.SIG.HS512)
                 .expiration(validity)
@@ -97,50 +103,25 @@ public class JwtTokenProvider{
         return new UsernamePasswordAuthenticationToken(user, token, authorities);
     }
 
-    public boolean validateToken(TokenDto token) {
+    public int validateToken(TokenDto token) {
 
         try {
             Jwts.parser()
                     .verifyWith(key)
                     .build().parseSignedClaims(token.getAccessToken());
-            return true;
+            return 1;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("Invalid JWT Token {}", e);
         } catch (ExpiredJwtException e) {
             log.info("Expired JWT Token {}", e);
+            return 101;
         } catch (UnsupportedJwtException e) {
             log.info("Unsupported JWT Token {}", e);
         } catch (IllegalArgumentException e) {
             log.info("JWT claims string is empty. {} ", e);
-        } catch (JwtException e){
-            log.info("what ? {} ",e);
         }
-        return false;
+        return 100;
     }
-
-    /* 임시  위 코드에서 만료 분리 예정*/
-    public boolean isExpired(TokenDto token){
-        if(token.getAccessToken() == null){return false;}
-
-        try {
-            Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token.getAccessToken());
-
-        }catch (ExpiredJwtException e){
-            log.error("act 시간 만료 {}",e);
-            return true;
-        }
-//        catch (ExpiredJwtException e) {
-//            token.setAccessToken(null);
-//            log.info("Expired JWT Token", e);
-//            return true;
-//        }
-        return false;
-    }
-
-
 
     private Claims parseClaims(String accessToken) {
         try {
@@ -153,23 +134,31 @@ public class JwtTokenProvider{
         }
     }
 
-    public boolean reloadAccessToken(TokenDto tokenDto){
-        UserDto userDto = (UserDto)getAuthentication(tokenDto.getAccessToken()).getPrincipal();
-        Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUserEmail(userDto.getUserEmail());
+    public String reloadAccessToken(TokenDto tokenDto){
+
+        System.out.println(getAuthentication(tokenDto.getAccessToken())+ "여기 뭐가 옴?");
+        String userEmail = parseClaims(tokenDto.getAccessToken()).getSubject();
+        System.out.println(userEmail+"??");
+        Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUserEmail(userEmail);
+
         if(optionalRefreshToken.isPresent()){
             if(optionalRefreshToken.get().getRefreshToken().equals(tokenDto.getRefreshToken())){
-                log.info("{} 사용자 토큰 재발급",userDto.getUserEmail());
 
-                return true;
+                SecurityContextHolder.getContext().setAuthentication(
+                        getAuthentication(tokenDto.getAccessToken())
+                );
+                System.out.println("뭐야 여기"+ SecurityContextHolder.getContext().getAuthentication());
+                return createAccessToken(SecurityContextHolder.getContext().getAuthentication(),"Name");
             }else{
-                log.error("{} 사용자 refresh 토큰 탈취 ",userDto.getUserEmail());
+                log.error("{} 사용자 refresh 토큰 탈취,변조 감지 ",userEmail);
                 refreshTokenRepository.delete(optionalRefreshToken.get());
                 tokenDto.setAccessToken(null);
                 tokenDto.setRefreshToken(null);
+                return "block";
             }
         }else{
-            log.info("{} 사용자 refresh 만료 재 로그인",userDto.getUserEmail());
+            log.info("{} 사용자 refresh 만료 재 로그인",userEmail);
+            return "reLogin";
         }
-        return false;
     }
 }

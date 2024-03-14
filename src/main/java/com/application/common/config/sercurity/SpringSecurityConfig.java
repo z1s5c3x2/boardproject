@@ -30,17 +30,19 @@ public class SpringSecurityConfig {
     private final LogoutService logoutService;
     private final CustomDetailsService customDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final static String HTML_PATH = "/test/";
+    private final static String HTML_PATH = "/user/";
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http)throws Exception{
         log.info("-------------------Security coning----------");
         http
                 .httpBasic(HttpBasicConfigurer::disable)
                 .authorizeHttpRequests(auth->auth
-                        .requestMatchers(HTML_PATH+"userlo.html").permitAll()
-                        .requestMatchers(HTML_PATH+"authPage.html").hasRole("Admin")
-                        .requestMatchers(HTML_PATH+"mypage.html").authenticated()
-                        .requestMatchers(HTML_PATH+"bpage.html").authenticated()
+                        .requestMatchers(HTML_PATH+"mypage").hasRole("USER")
+                        .requestMatchers(HTML_PATH+"admin").hasRole("ADMIN")
+//                        .requestMatchers(HTML_PATH+"userlo.html").permitAll()
+//                        .requestMatchers(HTML_PATH+"authPage.html").hasRole("Admin")
+//                        .requestMatchers(HTML_PATH+"mypage.html").authenticated()
+//                        .requestMatchers(HTML_PATH+"bpage.html").authenticated()
                         .anyRequest().permitAll())
                 .formLogin( login -> login
                         .usernameParameter("userEmail")
@@ -57,13 +59,9 @@ public class SpringSecurityConfig {
                         .logoutSuccessHandler(logoutService)
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID", "remember-me"))
-//                .rememberMe( re -> re
-//                        .rememberMeParameter("remember")
-//                        .tokenValiditySeconds(60 * 60 * 24 * 7)
-//                        .userDetailsService(customDetailsService)
-//                        .alwaysRemember(false)
-//                )
-                //.exceptionHandling( e -> e.accessDeniedPage(HTML_PATH+"accessdenied.html"))
+                .exceptionHandling(e->{
+                    e.accessDeniedPage("/user/login");
+                })
                 .sessionManagement( s-> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(new JwtAuthFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

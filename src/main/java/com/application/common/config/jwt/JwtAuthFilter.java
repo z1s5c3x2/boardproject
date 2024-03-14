@@ -1,6 +1,8 @@
 package com.application.common.config.jwt;
 
 import com.application.common.domain.dto.jwtService.TokenDto;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -22,7 +24,6 @@ import java.util.Arrays;
 @Slf4j
 public class JwtAuthFilter extends GenericFilterBean {
     private final JwtTokenProvider jwtTokenProvider;
-    private String sd = "accessToken";
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         //Cookie a = WebUtils.getCookie( (HttpServletRequest) request,"accessToken");
@@ -36,42 +37,38 @@ public class JwtAuthFilter extends GenericFilterBean {
 
         if(tokenDto.isNull()){
             log.info("토큰 발급 필요");
-        } else if( tokenDto.getRefreshToken() != null && jwtTokenProvider.isExpired(tokenDto)){
-            log.info("토큰 재발급 ㄱㄱ");
-            Authentication authentication = jwtTokenProvider.getAuthentication(tokenDto.getAccessToken());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String act = jwtTokenProvider.createAccessToken(authentication);
-            tokenDto.setAccessToken(act);
-            Arrays.stream(((HttpServletRequest) request).getCookies()).forEach(c->{
-                if(c.getName().equals("accessToken")){
-                    System.out.println("찾음");
-                    System.out.println(act);
-                    c.setValue(act);
-                    ((HttpServletResponse)response).addCookie(c);
-                }
-            });
+        } else if( tokenDto.getRefreshToken() != null){
+            log.info("토큰 확인");
+            int res = jwtTokenProvider.validateToken(tokenDto);
 
-        }else if (!jwtTokenProvider.validateToken(tokenDto)){
-            log.error("유효한 JWT 토큰이 없습니다, uri : {}",((HttpServletRequest) request).getRequestURI());
+            if(res==1){
+                log.info("토큰 유효");
+                Authentication authentication = jwtTokenProvider.getAuthentication(tokenDto.getAccessToken());
+                System.out.println("authentication = " + authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else if (res==101) {
+                log.info("rct 확인 후 갱신");
+                String actResult = jwtTokenProvider.reloadAccessToken(tokenDto);
+                if(actResult.equals("block")){
+                    log.info("토큰 변조,탈취 감지");
+                } else if (actResult.equals("reLogin")) {
+                    log.info("로그인 만료(리프레시 토큰 만료)");
+                }else{
+                    tokenDto.setAccessToken(actResult);
+                    Arrays.stream(((HttpServletRequest) request).getCookies()).forEach(c->{
+                        if(c.getName().equals("accessToken")){
+                            System.out.println("찾음");
+                            System.out.println(actResult);
+                            c.setValue(actResult);
+                            ((HttpServletResponse)response).addCookie(c);
+                        }
+                    });
+                }
+            }else{
+                log.info("토큰 에러");
+            }
+
         }
-//        else if (tokenDto.getAccessToken() == null &&  tokenDto.getRefreshToken() != null) {
-//            log.info("토큰 재발급 ㄱㄱ");
-//            jwtTokenProvider.reloadAccessToken(tokenDto);
-//        }
-        else{
-            log.info("잘됨");
-            Authentication authentication = jwtTokenProvider.getAuthentication(tokenDto.getAccessToken());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-//        if (token != null && jwtTokenProvider.validateToken(token)) {
-//
-//            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//            log.info("Security context에 인증 정보 저장 name :{} , uri : {}",authentication.getName(),((HttpServletRequest) request).getRequestURI());
-//        }else {
-//
-//            log.error("유효한 JWT 토큰이 없습니다, uri : {}",((HttpServletRequest) request).getRequestURI());
-//        }
         chain.doFilter(request,response);
     }
 

@@ -25,11 +25,14 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
+    @GetMapping("/mypage")
     public String asd(){
-        log.info("제발좀요 {} ", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-
-        return "asd";
+        log.info("내정보 {} ", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        return "내정보";
+    }
+    @GetMapping("/admin")
+    public  String asdgg(){
+        return "어드민 페이지";
     }
     @PostMapping("/register")
     public boolean userRegister(@Valid UserDto userDto) {
