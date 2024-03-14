@@ -24,8 +24,7 @@ import java.util.Objects;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @WebAppConfiguration
@@ -137,9 +136,7 @@ class UserControllerTest {
     @DisplayName("accessToken 재발급")
     void actRefresh() throws Exception{
         //given
-        Arrays.stream(cookies).forEach(c->{
-            System.out.println(c.getName()+" : "+ c.getValue());
-        });
+
         Thread.sleep(10000); // act liveTime
 
         //when
@@ -148,7 +145,9 @@ class UserControllerTest {
                 .andDo(print());
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(content().string("내정보"));
+                .andExpect(content().string("내정보"))
+                .andReturn();
+
     }
     @Test @Order(5)
     @DisplayName("일반 사용자로 관리자 페이지 이동")
@@ -170,14 +169,18 @@ class UserControllerTest {
         // 엑세스 토큰 재발급 이후 리프레시 토큰은 업데이트 되어 탈취된 토큰으로 요청하는 시나리오
         Arrays.stream(cookies).forEach(c->{
             if(c.getName().equals("refreshToken")){
-                c.setValue("tmp");
+                c.setValue("no"); // 변조
             }
         });
-
+        Thread.sleep(10000);
         //when
         ResultActions resultActions = mvc.perform(get("/user/mypage")
                         .cookie(cookies))
                 .andDo(print());
+        //then
+        MvcResult mvcResult = resultActions.andExpect(status().is3xxRedirection()).andReturn();
+        // 토큰 삭제 유무
+        Assertions.assertEquals(0, mvcResult.getResponse().getCookies().length);
     }
 
 
