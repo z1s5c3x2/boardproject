@@ -4,6 +4,7 @@ import com.application.common.config.jwt.JwtTokenProvider;
 import com.application.common.domain.dto.jwtService.LoginRequestDto;
 import com.application.common.domain.dto.jwtService.TokenDto;
 import com.application.common.domain.dto.userService.UserDto;
+import com.application.common.domain.entity.userService.UserEntity;
 import com.application.service.user.repository.UserEntityRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -51,10 +52,4 @@ public class UserService {
                             return true;
                         }).orElseGet(()->false);
     }
-
-    public String getTest(String tmp){
-        userEntityRepository.findAll();
-        return tmp+"getTest";
-    }
-
 }

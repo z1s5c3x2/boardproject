@@ -136,9 +136,9 @@ public class JwtTokenProvider{
 
     public String reloadAccessToken(TokenDto tokenDto){
 
-        System.out.println(getAuthentication(tokenDto.getAccessToken())+ "여기 뭐가 옴?");
+        //System.out.println(getAuthentication(tokenDto.getAccessToken())+ "여기 뭐가 옴?");
         String userEmail = parseClaims(tokenDto.getAccessToken()).getSubject();
-        System.out.println(userEmail+"??");
+        //System.out.println(userEmail+"??");
         Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByUserEmail(userEmail);
 
         if(optionalRefreshToken.isPresent()){
@@ -147,7 +147,7 @@ public class JwtTokenProvider{
                 SecurityContextHolder.getContext().setAuthentication(
                         getAuthentication(tokenDto.getAccessToken())
                 );
-                System.out.println("뭐야 여기"+ SecurityContextHolder.getContext().getAuthentication());
+                //System.out.println("뭐야 여기"+ SecurityContextHolder.getContext().getAuthentication());
                 return createAccessToken(SecurityContextHolder.getContext().getAuthentication(),"Name");
             }else{
                 log.error("{} 사용자 refresh 토큰 탈취,변조 감지 ",userEmail);

@@ -1,10 +1,14 @@
 package com.application.common.domain.entity.userService;
 
 import com.application.common.domain.dto.userService.UserDto;
+import com.application.common.domain.entity.boardService.BoardEntity;
 import com.application.common.domain.entity.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity @Data
 @Builder
@@ -41,6 +45,10 @@ public class UserEntity extends BaseTimeEntity {
     @Column(columnDefinition = "boolean default true",insertable = false)
     private boolean isEnabled;
 
+
+    @OneToMany(mappedBy = "userEntity",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<BoardEntity> boardEntities = new ArrayList<>();
 
     public UserDto toDto() {
         return UserDto.builder()
