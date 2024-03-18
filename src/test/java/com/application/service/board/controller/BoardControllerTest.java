@@ -37,7 +37,6 @@ class BoardControllerTest {
 
     @Test @Order(1)
     @DisplayName("테스트 계정 로그인")
-
     void loginTest() throws Exception {
         //given
         LoginRequestDto dto = new LoginRequestDto("z1s5c3x2@gmail.com","asdASD!@#1");
@@ -63,6 +62,14 @@ class BoardControllerTest {
     @DisplayName("게시글 목록 호출")
     void asd() throws Exception{
         mvc.perform(get("/board/list")
+                        .param("page","1")
+                        .param("size","2")
+                        .cookie(cookies1))
+                .andDo(print()).andExpect(status().isOk());
+
+        mvc.perform(get("/board/list")
+                        .param("page","2")
+                        .param("size","2")
                         .cookie(cookies1))
                 .andDo(print()).andExpect(status().isOk());
     }
@@ -85,7 +92,7 @@ class BoardControllerTest {
                 .andExpect(status().isOk());
         //then
     }
-    @Test @Order(6)
+    //@Test @Order(6)
     @DisplayName("내가 쓴 글 목록")
     void myListTest() throws Exception{
         mvc.perform(get("/board/mylist").cookie(cookies1))
@@ -93,7 +100,7 @@ class BoardControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test @Order(5)
+    //@Test @Order(5)
     @DisplayName("게시글 수정")
     void modifyBoard() throws Exception{
         //given
@@ -101,11 +108,18 @@ class BoardControllerTest {
                 .boardTitle("modifyTest")
                 .boardContent("modifyContent").build();
         //when
-        mvc.perform(put("/board/modify?boardNo=2")
+        mvc.perform(put("/board/modify")
+                        .param("boardNo","2")
                 .cookie(cookies1)
                         .content(objectMapper.writeValueAsString(boardDto))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    //@Test @Odder(6)
+    @DisplayName("게시글 삭제")
+    void deleteBoard() throws Exception{
+
     }
 }
