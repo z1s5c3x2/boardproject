@@ -3,6 +3,7 @@ package com.application.common.domain.entity.userService;
 import com.application.common.domain.dto.userService.UserDto;
 import com.application.common.domain.entity.boardService.BoardEntity;
 import com.application.common.domain.entity.common.BaseTimeEntity;
+import com.application.common.domain.entity.replyService.ReplyEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -49,6 +50,10 @@ public class UserEntity extends BaseTimeEntity {
     @OneToMany(mappedBy = "userEntity",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @Builder.Default
     private List<BoardEntity> boardEntities = new ArrayList<>();
+
+    @OneToMany(mappedBy = "userEntity",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<ReplyEntity> replyEntities = new ArrayList<>();
 
     public UserDto toDto() {
         return UserDto.builder()

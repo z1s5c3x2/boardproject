@@ -51,8 +51,6 @@ public class BoardService {
             userEntity.get().getBoardEntities().add(board);
             return true;
         }
-
-
         return false;
     }
 
